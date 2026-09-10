@@ -1,11 +1,11 @@
-# 🚀 Passage du POC au MVP — Puls-Events
+#  Passage du POC au MVP — Puls-Events
 
 [![AWS](https://img.shields.io/badge/AWS-ECS%20Fargate%20%7C%20Redis%20%7C%20CloudWatch-232F3E?logo=amazon-aws&logoColor=white)](#)
 [![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](#)
 [![Qdrant](https://img.shields.io/badge/Qdrant-Vector%20Database-DC2626)](#)
 [![Mistral AI](https://img.shields.io/badge/Mistral_AI-LLM%20%26%20Embeddings-FF7000)](#)
 
-## 📌 Présentation du projet
+##  Présentation du projet
 
 Ce projet consiste à faire évoluer un prototype de chatbot événementiel vers une architecture MVP plus robuste, évolutive et adaptée à une utilisation en production.
 
@@ -13,7 +13,7 @@ L’objectif est de permettre aux utilisateurs de rechercher des événements cu
 
 ---
 
-## 🎯 Contexte et objectifs du MVP
+##  Contexte et objectifs du MVP
 
 Le projet part d’un prototype de chatbot spécialisé dans la recherche d’événements culturels, qui a permis de valider l’intérêt de la recherche en langage naturel.
 
@@ -28,7 +28,7 @@ La mission consiste à transformer ce prototype en MVP pour :
 
 ---
 
-## 🏛️ Architecture cible
+##  Architecture cible
 
 L’architecture proposée repose sur :
 
@@ -43,7 +43,7 @@ L’architecture proposée repose sur :
 
 ---
 
-## 📄 Documents du projet
+##  Documents du projet
 
 | Livrable | Format | Lien |
 | :--- | :---: | :--- |
@@ -52,7 +52,7 @@ L’architecture proposée repose sur :
 
 ---
 
-## 🛠️ Travaux réalisés
+##  Travaux réalisés
 
 Dans le cadre de cette mission, j’ai réalisé :
 
@@ -66,15 +66,15 @@ Dans le cadre de cette mission, j’ai réalisé :
 
 ---
 
-## 🧰 Technologies étudiées et retenues
+##  Technologies étudiées et retenues
 
 `Python` • `FastAPI` • `AWS ECS Fargate` • `Amazon API Gateway` • `Amazon ElastiCache for Redis` • `Qdrant Cloud` • `Mistral AI` • `smolagents` • `OpenAgenda` • `LangSmith` • `Amazon CloudWatch`
 
 ---
 
-## 📂 Portfolio et compétences mobilisées
+##  Portfolio et compétences mobilisées
 
-### 🎯 Compétences démontrées
+###  Compétences démontrées
 
 - analyse et cadrage d’un besoin métier ;
 - conception d’une architecture IA et Cloud ;
@@ -86,7 +86,7 @@ Dans le cadre de cette mission, j’ai réalisé :
 - documentation technique ;
 - présentation et vulgarisation de choix techniques.
 
-### 👤 À propos
+###  À propos
 
 Projet réalisé dans le cadre de ma formation Data Engineer OpenClassrooms.
 
