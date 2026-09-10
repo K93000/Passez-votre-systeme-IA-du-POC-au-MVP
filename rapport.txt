@@ -1,0 +1,116 @@
+================================================================================
+          RAPPORT DE CADRAGE TECHNIQUE & BUDGÉTAIRE — MVP PULS-EVENTS
+================================================================================
+
+1. CONTEXTE & OBJECTIFS DU PROJET
+--------------------------------------------------------------------------------
+1.1 Contexte Métier
+Dans le cadre de la promotion et de la valorisation des événements culturels, la 
+plateforme Puls-Events vise à proposer un assistant virtuel intelligent basé sur 
+les technologies de Génération Augmentée par Récupération (RAG). Cet outil offre 
+aux utilisateurs une recherche fluide, interactive et contextuelle d'événements 
+(concerts, expositions, pièces de théâtre, festivals).
+
+1.2 Objectifs Stratégiques du MVP
+- Accessibilité : Offrir une interface utilisateur en langage naturel (Web/Mobile).
+- Pertinence : Combiner la recherche sémantique vectorielle et le filtrage géographique précis.
+- Proactivité : Compléter dynamiquement les données d'événements manquantes via un agent autonome de recherche Web.
+- Maîtrise Opérationnelle : Garantir une infrastructure serverless évolutive, sécurisée et à coût maîtrisé.
+
+
+2. PÉRIMÈTRE & FONCTIONNALITÉS DU MVP
+--------------------------------------------------------------------------------
+2.1 Fonctionnalités Clés
+- Interface Utilisateur : Saisie de requêtes en langage naturel et restitution des réponses sous forme synthétique et structurée.
+- Orchestration RAG : Traitement de la requête, gestion de la mémoire de conversation, interrogation de la base vectorielle et synthèse par un modèle de langage (LLM).
+- Ingestion de Données : Synchronisation automatique depuis la source OpenAgenda.
+- Recherche Complémentaire : Utilisation d'un agent de recherche Web (smolagents) pour enrichir les fiches événements incomplètes.
+- Observabilité : Centralisation des métriques, journaux d'exécution et évaluation de la qualité du RAG.
+
+2.2 Périmètre Exclu du MVP
+- Système de billetterie ou de paiement en ligne.
+- Authentification multi-facteurs complexe (utilisation d'une sécurisation standard via API Gateway).
+- Modèles LLM hébergés sur infrastructure dédiée on-premise.
+
+
+3. CHOIX TECHNOLOGIQUES & JUSTIFICATIONS
+--------------------------------------------------------------------------------
+- FastAPI (ECS Fargate) : Framework Python asynchrone à haute performance, déployé sur un conteneur serverless AWS ECS Fargate pour éliminer la gestion d'infrastructures physiques.
+- Amazon ElastiCache for Redis : Stockage en mémoire à très faible latence pour maintenir l'historique et la mémoire conversationnelle des sessions utilisateurs.
+- Qdrant Cloud : Base de données vectorielle gérée, optimisée pour le calcul de similarité cosinus et le filtrage métadonnée (ex. filtres géographiques).
+- Mistral AI : Modèle de langage performant pour la synthèse d'information en français, accessible via API.
+- smolagents : Framework léger permettant de déclencher des recherches Web ciblées en cas d'information manquante dans la base principale.
+- OpenAgenda : Source de données principale alimentant le référentiel d'événements culturels.
+- Amazon CloudWatch & LangSmith : Combinaison pour le suivi de l'infrastructure AWS (CloudWatch) et la traçabilité fine des chaînes de prompts/réponses (LangSmith).
+
+
+4. ARCHITECTURE TECHNIQUE & REPRÉSENTATION DES FLUX
+--------------------------------------------------------------------------------
+4.1 Principes d'Architecture
+L'architecture repose sur un modèle hybride Serverless et Cloud-Managed, garantissant un découplage fort entre le traitement applicatif, la mémoire de session, le magasin de données vectorielles et le modèle de génération.
+
+4.2 Représentation et Orchestration des Flux
+(Insérer le schéma graphique d'architecture à cet endroit dans votre document final)
+
+Description chronologique des flux :
+1. Requête utilisateur : L'utilisateur pose une question en langage naturel (1. Question).
+2. Point d'entrée sécurisé : La requête passe par Amazon API Gateway (2. Requête) qui assure l'authentification et le contrôle du trafic HTTP(S).
+3. Traitement Backend : Le service FastAPI sur ECS Fargate orchestre la demande :
+   - Consultation d'Amazon ElastiCache for Redis (3. Mémoire) pour l'historique de session.
+   - Interrogation de Qdrant Cloud (5. Recherche d'événements) pour la recherche sémantique et géo-filtrée.
+   - En cas d'information manquante, appel à smolagents (4. Recherche Web) pour compléter les données.
+4. Alimentation continue : La source OpenAgenda alimente automatiquement la base Qdrant Cloud.
+5. Génération LLM : Le contexte rassemblé (Qdrant + smolagents) est transmis à Mistral AI pour générer la réponse finale.
+6. Restitution & Supervision : La réponse est renvoyée à l'utilisateur (6. Réponse). En parallèle, Amazon CloudWatch et LangSmith collectent les logs, métriques et traces RAG.
+
+c:\Users\Lenovo Thinkpad L16\Pictures\Screenshots\Capture d'écran 2026-09-10 113819.png
+5. ESTIMATION DES COÛTS & ANALYSE BUDGÉTAIRE (OPEX)
+--------------------------------------------------------------------------------
+5.1 Hypothèses de Trafic
+- Profil FAIBLE (Démarrage / Tests) : ~1 000 à 5 000 requêtes / mois.
+- Profil MOYEN (Exploitation MVP nominale) : ~50 000 à 100 000 requêtes / mois.
+
+5.2 Tableau de Projection des Coûts Opérationnels (OPEX Mensuel)
+
++-------------------------------------+---------------+---------------+---------------------------------------+
+| Composant / Service                 | Profil FAIBLE | Profil MOYEN  | Remarques / Mode de facturation       |
++-------------------------------------+---------------+---------------+---------------------------------------+
+| AWS API Gateway                     | < 1,00 €      | ~3,00 €       | Facturation au million de requêtes    |
+| AWS ECS Fargate (FastAPI)           | 15,00 €       | 45,00 €       | Dimensionnement vCPU/RAM à l'usage    |
+| Amazon ElastiCache for Redis        | 12,00 €       | 25,00 €       | Instance petite taille (session)      |
+| Qdrant Cloud                        | 0,00 €        | 25,00 €       | Gratuit en démarrage, cluster géré    |
+| Mistral AI (API LLM)                | 2,00 €        | 20,00 €       | Facturation aux tokens consommés      |
+| smolagents (Agent Web)              | 0,00 €        | 15,00 €       | Requêtes moteur / scraping            |
+| OpenAgenda (API)                    | 0,00 €        | 0,00 €        | Accès Open Data / API gratuite        |
+| Monitoring (CloudWatch + LangSmith) | 0,00 €        | 10,00 €       | Rétention logs et traces d'évaluation |
++-------------------------------------+---------------+---------------+---------------------------------------+
+| TOTAL OPEX MENSUEL ESTIMÉ           | ~30,00 €      | ~143,00 €     | Hors ingénierie et maintenance        |
++-------------------------------------+---------------+---------------+---------------------------------------+
+
+
+6. ANALYSE DES RISQUES & PLAN D'ATTÉNUATION
+--------------------------------------------------------------------------------
+- Hallucination du LLM (Impact: Élevé | Probabilité: Moyenne)
+  Atténuation : Prompt-system strict limitant la réponse au contexte RAG fourni par Qdrant.
+- Latence globale élevée (Impact: Moyen | Probabilité: Moyenne)
+  Atténuation : Cache de session Redis et optimisation du top-k de recherche dans Qdrant.
+- Dépassement de budget API (Impact: Moyen | Probabilité: Faible)
+  Atténuation : Seuils d'alerte sur AWS Budgets et quotas d'appels sur API Gateway.
+- Indisponibilité des sources Web (Impact: Faible | Probabilité: Faible)
+  Atténuation : Mode dégradé répondant uniquement sur les données Qdrant en cas d'échec de l'agent Web.
+
+
+7. ROADMAP DE DÉPLOIEMENT
+--------------------------------------------------------------------------------
+- Semaines 1-2 : Ingestion du jeu de données OpenAgenda et configuration du cluster Qdrant Cloud.
+- Semaines 3-4 : Développement de l'API FastAPI, intégration de Redis et des connecteurs Mistral AI / smolagents.
+- Semaine 5    : Configuration du déploiement ECS Fargate, de l'API Gateway et de l'observabilité.
+- Semaine 6    : Recette fonctionnelle, tests de charge et livraison de la version finale.
+
+
+8. ANNEXES & LIENS PROJETS
+--------------------------------------------------------------------------------
+- Dépôt GitHub du Projet : https://github.com/votre-compte/puls-events-rag
+- Documentation des API  : Accessible sur Swagger UI via l'endpoint /docs du service FastAPI.
+- Fichier Diagramme     : Fichier de sauvegarde Visual Studio Code nommé architecture_puls_events.drawio.
+================================================================================
