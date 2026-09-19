@@ -2,7 +2,7 @@
 
 ##  Présentation
 
-Ce projet constitue le dernier projet du parcours **Data Engineer OpenClassrooms**.
+Ce projet s'inscrit dans le parcours **Data Engineer d'OpenClassrooms**.
 
 La mission consiste à faire évoluer un système d'IA existant, développé sous forme de **Proof of Concept (POC)**, vers une proposition de **Minimum Viable Product (MVP)** exploitable et évolutive.
 
